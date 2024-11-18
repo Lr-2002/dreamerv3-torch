@@ -193,6 +193,13 @@ class RSSM(nn.Module):
                 )
 
         prior = self.img_step(prev_state, prev_action)
+        def show_dict_shape(dd):
+            if isinstance(dd, dict):
+                for k,v in dd.items():
+                    print(k, v.shape) 
+            else:
+                print(dd.shape)
+        # print('----- prior shape is', prior.shape, 'prev_state shape', prev_state.shape)
         x = torch.cat([prior["deter"], embed], -1)
         # (batch_size, prior_deter + embed) -> (batch_size, hidden)
         x = self._obs_out_layers(x)

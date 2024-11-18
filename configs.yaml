@@ -102,6 +102,8 @@ dmc_proprio:
   encoder: {mlp_keys: '.*', cnn_keys: '$^'}
   decoder: {mlp_keys: '.*', cnn_keys: '$^'}
 
+
+
 dmc_vision:
   steps: 1e6
   action_repeat: 2
@@ -111,6 +113,16 @@ dmc_vision:
   encoder: {mlp_keys: '$^', cnn_keys: 'image'}
   decoder: {mlp_keys: '$^', cnn_keys: 'image'}
 
+simpler_vision:
+  steps: 1e6
+  action_repeat: 1
+  envs: 1
+  train_ratio: 512
+  video_pred_log: true
+  encoder: {mlp_keys: '$^', cnn_keys: 'image'}
+  decoder: {mlp_keys: '$^', cnn_keys: 'image'}
+
+  
 crafter:
   task: crafter_reward
   step: 1e6

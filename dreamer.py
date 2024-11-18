@@ -16,7 +16,7 @@ import models
 import tools
 import envs.wrappers as wrappers
 from parallel import Parallel, Damy
-
+import wandb 
 import torch
 from torch import nn
 from torch import distributions as torchd
@@ -34,6 +34,7 @@ class Dreamer(nn.Module):
         batch_steps = config.batch_size * config.batch_length
         self._should_train = tools.Every(batch_steps / config.train_ratio)
         self._should_pretrain = tools.Once()
+        self._should_wandb = True 
         self._should_reset = tools.Every(config.reset_every)
         self._should_expl = tools.Until(int(config.expl_until / config.action_repeat))
         self._metrics = {}
@@ -193,6 +194,9 @@ def make_env(config, mode, id):
 
         env = minecraft.make_env(task, size=config.size, break_speed=config.break_speed)
         env = wrappers.OneHotAction(env)
+    elif suite == 'simpler':
+        import envs.simplerenv as simpler 
+        env = simpler.SimplerEnv(task, size=config.size)
     else:
         raise NotImplementedError(suite)
     env = wrappers.TimeLimit(env, config.time_limit)
@@ -343,6 +347,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--configs", nargs="+")
     args, remaining = parser.parse_known_args()
+    wandb.init(project='simplerenv_coke', sync_tensorboard =True)
+
     configs = yaml.safe_load(
         (pathlib.Path(sys.argv[0]).parent / "configs.yaml").read_text()
     )
@@ -363,3 +369,4 @@ if __name__ == "__main__":
         arg_type = tools.args_type(value)
         parser.add_argument(f"--{key}", type=arg_type, default=arg_type(value))
     main(parser.parse_args(remaining))
+    wandb.finish()
