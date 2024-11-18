@@ -197,6 +197,9 @@ def make_env(config, mode, id):
     elif suite == 'simpler':
         import envs.simplerenv as simpler 
         env = simpler.SimplerEnv(task, size=config.size)
+    elif suite == 'franka':
+        import envs.frankakitchen as franka
+        env = franka.FrankaKitchenEnv(task, size=config.size)
     else:
         raise NotImplementedError(suite)
     env = wrappers.TimeLimit(env, config.time_limit)
@@ -346,8 +349,9 @@ def main(config):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--configs", nargs="+")
+    parser.add_argument('--debug', default=False)
     args, remaining = parser.parse_known_args()
-    wandb.init(project='simplerenv_coke', sync_tensorboard =True)
+    wandb.init(project='simplerenv_coke', sync_tensorboard =True) if args.debug else None 
 
     configs = yaml.safe_load(
         (pathlib.Path(sys.argv[0]).parent / "configs.yaml").read_text()
@@ -369,4 +373,4 @@ if __name__ == "__main__":
         arg_type = tools.args_type(value)
         parser.add_argument(f"--{key}", type=arg_type, default=arg_type(value))
     main(parser.parse_args(remaining))
-    wandb.finish()
+    wandb.finish() if args.debug else None 
